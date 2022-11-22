@@ -98,8 +98,8 @@ string find_min_max(node *root ,const int &a ,const int &b){
 		evaluate_ans.insert(evaluate(root , i));
 	}
 	string first = to_string(*evaluate_ans.begin());
-    set<float>::iterator it = evaluate_ans.end();
-    it--;
+    	set<float>::iterator it = evaluate_ans.end();
+   	 it--;
 	string last = to_string(*it);
 	return "Max , : " + last + " Min , : " + first;
 }
