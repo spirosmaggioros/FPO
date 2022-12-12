@@ -1,3 +1,4 @@
+
 #include <bits/stdc++.h>
 
 using namespace std;
@@ -7,6 +8,83 @@ struct node{
     int exponent;
     node *right , *left;
 };
+
+struct node_derivative{
+    pair<int ,int> coeff;
+    int exponent;
+    node_derivative *right , *left;
+};
+
+void inorder(ostream & out , node_derivative *root){
+    if(root){
+        inorder(out , root -> left);
+        out << root -> coeff.first << "/" << root -> coeff.second << "x^" << root -> exponent << " ";
+        inorder(out , root -> right);
+    }
+}
+
+void simplify(node_derivative *root){
+    if(!root){return;}
+    stack<node_derivative*> s;
+    s.push(root);
+    auto simplify = [&](int a , int b) -> pair<int , int>{
+            int denom = __gcd(a , b);
+            a /= denom;
+            b /= denom;
+            return {a,b};
+        };
+    while(!s.empty()){
+        node_derivative *current = s.top();
+        pair<int , int> temp = simplify(current -> coeff.first , current -> coeff.second);
+        current -> coeff = temp;
+        s.pop();
+        if(current -> right){s.push(current -> right);}
+        if(current -> left)s.push(current -> left);
+    }
+}
+
+ostream & operator << (ostream & out , node_derivative *root){
+    if(!root){out << "Empty!" << '\n'; return out;}
+    simplify(root);
+    inorder(out , root);
+    return out;
+}
+
+node_derivative *new_node(const int & a , const int &b , const int &exponent){
+    node_derivative *p = new node_derivative;
+    p -> coeff = {a , b};
+    p -> exponent = exponent;
+    p -> right = p -> left = nullptr;
+    return p;
+    
+}
+
+node_derivative *insert_der(node_derivative *root , const int &a , const int &b ,const int &exponent){
+    if(!root){
+        return new_node(a , b , exponent);
+    }
+    else{
+        if(root -> exponent < exponent){
+          root -> right = insert_der(root -> right , a , b , exponent);
+        }
+        else if(root -> exponent > exponent){
+            root -> left = insert_der(root -> left , a , b, exponent);
+        }
+        else{
+            auto simplify = [&](int a , int b) -> pair<int , int>{
+                int denom = __gcd(a , b);
+                a /= denom;
+                b /= denom;
+                return {a,b};
+            };
+            pair<int , int> temp= simplify(root -> coeff.first + a , root -> coeff.second + b);    
+            root -> coeff = temp; 
+            return root;       
+        }
+    }
+    return root;
+}
+
 
 void inorder(ostream &out  , node *root){
     if(root){
@@ -49,6 +127,26 @@ node *insert(node *root , const int &coefficient , const int &exponent){
     return root;
 }
 
+//
+node *node_derivative_to_node(node_derivative *root_derivative){
+    if(!root_derivative){
+        return nullptr;
+    }
+    node *head = nullptr;
+    queue<node_derivative*> q;
+    q.push(root_derivative);
+    while(!q.empty()){
+        node_derivative *current = q.front();
+        int coeff = current -> coeff.first / current -> coeff.second;
+        int exp = current -> exponent;
+        head = insert(head , coeff , exp);
+        if(current -> right){q.push(current -> right);}
+        if(current -> left){q.push(current -> left);}
+    }
+    return head;
+}
+//need to change the types
+
 
 float evaluate(node *root , const double &d){
     if(!root){return 0.0;}
@@ -88,6 +186,24 @@ node *derivative(node *root , int &times){
         temp = derivative_helper(temp);
     }
     return temp;
+}
+
+node_derivative *intergal(node *root){
+    node_derivative *p = nullptr;
+    if(!root){return p;}
+    queue<node*> q;
+    q.push(root);
+    while(!q.empty()){
+        node *current = q.front();
+        int coeff_a = current -> coeff;
+        int coeff_b = current -> exponent + 1;
+        int exp = current -> exponent + 1;
+        p = insert_der(p , coeff_a , coeff_b , exp);
+        q.pop();
+        if(current -> right){q.push(current -> right);}
+        if(current -> left){q.push(current -> left);}
+    }
+    return p;
 }
 
 string find_min_max(node *root ,const int &a ,const int &b){
