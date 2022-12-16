@@ -117,6 +117,28 @@ private:
 		return ans;
 	}
 
+	void simplify(unique_ptr<BST_node> &node){
+		if(!node){return;}
+		stack<const unique_ptr<BST_node> *> s;
+		s.push(&node);
+
+		auto it = [&](int a , int b) -> pair<int ,int>{
+			int denom = __gcd(a,b);
+			a /= denom;
+			b /= denom;
+			return {a,b};
+		};
+		while(!s.empty()){
+			auto current = s.top();
+			pair<int ,int> temp = it((*current) -> coeff.first , (*current) -> coeff.second);
+			(*current) -> coeff = temp;
+			s.pop();
+			if((*current) -> right){s.push(&(*current) -> right);}
+			if((*current) -> left){s.push(&(*current) -> left);}
+		}
+		return;
+	}
+
 public:
 	BST(){
 		root = nullptr;
@@ -159,6 +181,11 @@ public:
 		return ans;
 	}
 
+	void simplify(){
+		if(!root){return;}
+		return simplify(root);
+	}
+
 };
 
 void print_array(vector<tuple<int ,int ,int> > &_inserted){
@@ -171,4 +198,5 @@ void print_array(vector<tuple<int ,int ,int> > &_inserted){
   	}
 	return;
 }
+
 
