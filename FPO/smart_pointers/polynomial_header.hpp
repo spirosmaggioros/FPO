@@ -102,6 +102,21 @@ private:
 		_inorder(callback , node -> right);
 	}
 
+	long double evaluate(unique_ptr<BST_node> &node , const double &d ){
+		if(!root){return 0.0;}
+		long double ans = 0;
+		stack<const unique_ptr<BST_node> *> s;
+		s.push(&node);
+		while(!s.empty()){
+			auto current = s.top();
+			ans += (float(float((*current) -> coeff.first) / float((*current) -> coeff.second)) * powf(d , (*current) -> exponent));
+			s.pop();
+			if((*current) -> right){s.push(&((*current)-> right));}
+			if((*current) -> left){s.push(&((*current) -> left));}
+		}
+		return ans;
+	}
+
 public:
 	BST(){
 		root = nullptr;
@@ -135,6 +150,12 @@ public:
 	vector<tuple<int , int , int> > get_elements_postorder(){
 		vector<tuple<int , int , int> > ans;
 		_postorder([&](tuple<int ,int , int> callbacked) {ans.push_back(callbacked);}, root);
+		return ans;
+	} 
+
+	float evaluate(const float &d){
+		if(!root){return 0.0;}
+		float ans = evaluate(root , d);
 		return ans;
 	}
 
