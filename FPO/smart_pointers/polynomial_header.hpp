@@ -139,6 +139,42 @@ private:
 		return;
 	}
 
+	BST derivative(unique_ptr<BST_node> &node, int times){
+		BST new_node;
+		if(!node){return new_node;}
+		stack<const unique_ptr<BST_node> *> s;
+		s.push(&node);
+		while(!s.empty()){
+			auto current = s.top();
+			int exponent = (*current) -> exponent - 1;
+			int coeff_first =(*current) -> coeff.first *  (*current) -> exponent;
+			int coeff_second = (*current) -> coeff.second;
+			new_node.insert(coeff_first , coeff_second , exponent);
+			s.pop();
+			if((*current) -> right){s.push(&(*current) -> right);}
+			if((*current) -> left){s.push(&(*current) -> left);}
+		}
+		return new_node;
+	}
+
+	BST intergal(unique_ptr<BST_node> &node , int times){
+		BST new_node;
+		if(!node){return new_node;}
+		stack<const unique_ptr<BST_node> *> s;
+		s.push(&node);
+		while(!s.empty()){
+			auto current = s.top();
+			int exponent = (*current) -> exponent + 1;
+			int coeff_first = (*current) -> coeff.first;
+			int coeff_second = (*current) -> coeff.second * ((*current) -> exponent + 1);
+			new_node.insert(coeff_first , coeff_second , exponent);
+			s.pop();
+			if((*current) -> right){s.push(&(*current) -> right);}
+			if((*current) -> left){s.push(&(*current) -> left);}
+		}
+		return new_node;
+	}
+
 public:
 	BST(){
 		root = nullptr;
@@ -186,6 +222,14 @@ public:
 		return simplify(root);
 	}
 
+	BST derivative(int times){
+		return derivative(root , times);
+	}
+
+	BST intergal(int times){
+		return intergal(root , times);
+	}
+
 };
 
 void print_array(vector<tuple<int ,int ,int> > &_inserted){
@@ -198,5 +242,4 @@ void print_array(vector<tuple<int ,int ,int> > &_inserted){
   	}
 	return;
 }
-
 
