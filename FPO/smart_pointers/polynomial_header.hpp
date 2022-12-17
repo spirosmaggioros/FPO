@@ -2,6 +2,8 @@
 
 using namespace std;
 
+typedef complex<double> cd;
+
 class BST{
 private:
 	struct BST_node{
@@ -44,7 +46,7 @@ private:
 			}
 		}
 		else if(c == node -> exponent){
-			pair<int , int> temp = make_pair(a*node -> coeff.second + node -> coeff.first*b , b*node -> coeff.second);
+			pair<int , int> temp = make_pair((a*node -> coeff.second) + (node -> coeff.first*b) , b*node -> coeff.second);
 			node -> coeff = temp;
 			return true;
 		}
@@ -62,7 +64,7 @@ private:
 			return contains(node -> right , a , b, c);
 		}
 		else{
-			if(node -> coeff.first == a && node -> coeff.second == b){\
+			if(node -> coeff.first == a && node -> coeff.second == b){
 				return true;
 			}
 		}
@@ -175,6 +177,61 @@ private:
 		return new_node;
 	}
 
+	BST _add(BST &node1 , BST &node2){
+		BST tree;
+		if((!node1.root && !node2.root) || (node1.root && !node2.root)){
+			return tree; 
+		}
+		stack<const unique_ptr<BST_node> *> s;
+		s.push(&node1.root);
+		while(!s.empty()){
+			auto *current = s.top();
+			bool res = tree.insert((*current) -> coeff.first , (*current) -> coeff.second , (*current) -> exponent);
+			s.pop();
+			if((*current) -> right){s.push(&(*current) -> right);}
+			if((*current) -> left){s.push(&(*current) -> left);}
+		}
+
+		stack<const unique_ptr<BST_node> *> p;
+		p.push(&node2.root);
+		while(!p.empty()){
+			auto *current = p.top();
+			bool res = tree.insert((*current) -> coeff.first , (*current) -> coeff.second , (*current) -> exponent);
+			p.pop();
+			if((*current) -> right){p.push(&(*current) -> right);}
+			if((*current) -> left){p.push(&(*current) -> left);}
+		}
+		return tree;
+	}
+
+	BST _multiply(BST &node1 , BST &node2){
+		BST tree;
+		if(!node1.root || !node2.root){return tree;}
+		stack<const unique_ptr<BST_node> *> s;
+		s.push(&node1.root);
+		vector<tuple<int , int , int> > list_node;
+		while(!s.empty()){
+			auto *current = s.top();
+			list_node.push_back(make_tuple((*current) -> coeff.first , (*current) -> coeff.second , (*current) -> exponent));
+			s.pop();
+			if((*current) -> right){s.push(&(*current) -> right);}
+			if((*current) -> left){s.push(&(*current) -> left);}
+		}
+		int n = list_node.size();
+		for(int i = 0; i<n; i++){
+			stack<const unique_ptr<BST_node> *> p;
+			p.push(&node2.root);
+			while(!p.empty()){
+				auto *current = p.top();
+				tree.insert(get<0>(list_node[i]) * (*current) -> coeff.first , get<1>(list_node[i]) * (*current) -> coeff.second , (*current) -> exponent + get<2>(list_node[i]));
+				p.pop();
+				if((*current) -> right){p.push(&(*current) -> right);}
+				if((*current) -> left){p.push(&(*current) -> left);}
+			}
+		}
+		return tree;
+	}
+
 public:
 	BST(){
 		root = nullptr;
@@ -230,6 +287,14 @@ public:
 		return intergal(root , times);
 	}
 
+	BST _add(BST &tree1){
+		return _add(*this , tree1);
+	}
+	
+	BST _multiply(BST &tree1){
+		return _multiply(*this , tree1);
+	}
+
 };
 
 void print_array(vector<tuple<int ,int ,int> > &_inserted){
@@ -242,4 +307,3 @@ void print_array(vector<tuple<int ,int ,int> > &_inserted){
   	}
 	return;
 }
-
