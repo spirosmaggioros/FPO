@@ -28,6 +28,7 @@ int height(node *root) {
 
 int getBalance(node *root) { return height(root->left) - height(root->right); }
 
+//rotations in O(1)
 node *rightRotate(node *root) {
     node *t = root->left;
     node *u = t->right;
@@ -36,6 +37,7 @@ node *rightRotate(node *root) {
     return t;
 }
 
+//rotarions in O(1)
 node *leftRotate(node *root) {
     node *t = root->right;
     node *u = t->left;
@@ -50,7 +52,7 @@ node *minValue(node *root) {
     return minValue(root->left);
 }
 
-//insertion O(logn)
+//insertion O(logd)
 node *insert(node *root, const int &a , const int &b) {
     node *nn = createNode(a, b);
     if (root == nullptr)
@@ -78,6 +80,7 @@ node *insert(node *root, const int &a , const int &b) {
     return root;
 }
 
+//level order O(logd)
 void level_order(node *root , int &counter , ostream &out){
     if(root){
         level_order(root -> left , counter , out);
@@ -104,7 +107,7 @@ void level_order(node *root , int &counter , ostream &out){
     }
 }
 
-//evalueate O(logn)
+//evaluate O(logd)
 void evaluate_helper(node *root , const int &a , double &ans){
     if(root){
         evaluate_helper(root -> left , a , ans);
@@ -120,6 +123,68 @@ double evaluate(node *root , const int &a){
     return ans;
 }
 
+void __inorder(function<void(node*)> callback , node *root){
+    if(root){
+        __inorder(callback , root -> left);
+        callback(root);
+        __inorder(callback , root -> right);
+    }
+}
+
+//adding O(log^2(d))
+node *add(node *root1 , node *root2){
+    if(!root1 && root2){return root2;}
+    if(!root2 && root1){return root1;}
+    if(!root1 && !root2){return nullptr;}
+    node *temp = root1;
+    __inorder([&](node* callbacked){temp = insert(temp , callbacked -> coeff , callbacked -> expon);}, root2);
+    return temp;
+}
+
+
+//substraction O(dlogd)
+node *substract(node *root1 , node *root2){
+    if(!root1 && root2){return root2;}
+    if(!root2 && root1){return root1;}
+    if(!root1 && !root2){return nullptr;}
+    node *temp = root1;
+    stack<node*> s;
+    s.push(root2);
+    while(!s.empty()){
+        auto current = s.top();
+        s.pop();
+        temp = insert(temp , -current -> coeff , current -> expon);
+        if(current -> right){s.push(current -> right);}
+        if(current -> left){s.push(current -> left);}
+    }
+    return temp;
+}
+
+
+//multiplication O(d^2logd)
+node *multiply(node *root1 , node *root2){
+    if(!root1 || !root2){return nullptr;}
+    node *ans = nullptr;
+    stack<node*> s;
+    s.push(root1);
+    while(!s.empty()){
+        auto current = s.top();
+        s.pop();
+        stack<node*> s2;
+        s2.push(root2);
+        while(!s2.empty()){
+            auto current2 = s2.top();
+            s2.pop();
+            ans = insert(ans , current2 -> coeff * current -> coeff , current2 -> expon + current -> expon);
+            if(current2 -> right){s2.push(current2 -> right);}
+            if(current2 -> left){s2.push(current2 -> left);}
+        }
+        if(current -> right){s.push(current -> right);}
+        if(current -> left){s.push(current -> left);}
+    }
+    return ans;
+}
+
 ostream & operator << (ostream &out , node *root){
     assert(root != nullptr);
     int counter = 0;
@@ -128,12 +193,13 @@ ostream & operator << (ostream &out , node *root){
 }
 
 int main() {
-    node *root = nullptr;
-    root = insert(root , 2 ,2);
-    root = insert(root , 1 , 1);
-    root = insert(root , 5 , 3);
-    root = insert(root , 6 , 4);
-    root = insert(root , 7 , 5);
-    cout << root << '\n';
-    cout << evaluate(root , 1) << '\n';
+    node *root1 = nullptr , *root2 = nullptr;
+    root1 = insert(root1 , 1 , 2);
+    root1 = insert(root1 , 1 , 1);
+
+    root2 = insert(root2 , 1 , 3);
+    root2 = insert(root2 , 3 , 2);
+
+    node *root3 = add(root1 , root2);
+    cout << root3 << '\n';
 }
