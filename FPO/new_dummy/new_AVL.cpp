@@ -153,7 +153,7 @@ node *substract(node *root1 , node *root2){
 }
 
 
-//multiplication O(d^2logd)
+//multiplication O(log^3(d))
 node *multiply(node *root1 , node *root2){
     if(!root1 || !root2){return nullptr;}
     node *ans = nullptr;
