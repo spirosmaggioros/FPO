@@ -142,21 +142,13 @@ node *add(node *root1 , node *root2){
 }
 
 
-//substraction O(dlogd)
+//substraction O(log^2(d))
 node *substract(node *root1 , node *root2){
     if(!root1 && root2){return root2;}
     if(!root2 && root1){return root1;}
     if(!root1 && !root2){return nullptr;}
     node *temp = root1;
-    stack<node*> s;
-    s.push(root2);
-    while(!s.empty()){
-        auto current = s.top();
-        s.pop();
-        temp = insert(temp , -current -> coeff , current -> expon);
-        if(current -> right){s.push(current -> right);}
-        if(current -> left){s.push(current -> left);}
-    }
+    __inorder([&](node *callbacked){temp = insert(temp , -callbacked -> coeff , callbacked -> expon);} , root2);
     return temp;
 }
 
@@ -170,15 +162,7 @@ node *multiply(node *root1 , node *root2){
     while(!s.empty()){
         auto current = s.top();
         s.pop();
-        stack<node*> s2;
-        s2.push(root2);
-        while(!s2.empty()){
-            auto current2 = s2.top();
-            s2.pop();
-            ans = insert(ans , current2 -> coeff * current -> coeff , current2 -> expon + current -> expon);
-            if(current2 -> right){s2.push(current2 -> right);}
-            if(current2 -> left){s2.push(current2 -> left);}
-        }
+        __inorder([&](node *callbacked){ans = insert(ans , callbacked -> coeff * current -> coeff , callbacked -> expon + current -> expon);} , root2);
         if(current -> right){s.push(current -> right);}
         if(current -> left){s.push(current -> left);}
     }
@@ -200,6 +184,6 @@ int main() {
     root2 = insert(root2 , 1 , 3);
     root2 = insert(root2 , 3 , 2);
 
-    node *root3 = add(root1 , root2);
+    node *root3 = multiply(root1 , root2);
     cout << root3 << '\n';
 }
