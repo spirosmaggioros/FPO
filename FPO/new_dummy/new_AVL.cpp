@@ -107,7 +107,7 @@ void level_order(node *root , int &counter , ostream &out){
     }
 }
 
-//evaluate O(logd)
+//evaluate O(d)
 void evaluate_helper(node *root , const int &a , double &ans){
     if(root){
         evaluate_helper(root -> left , a , ans);
@@ -131,7 +131,7 @@ void __inorder(function<void(node*)> callback , node *root){
     }
 }
 
-//adding O(log^2(d))
+//adding O(dlog(d))
 node *add(node *root1 , node *root2){
     if(!root1 && root2){return root2;}
     if(!root2 && root1){return root1;}
@@ -142,7 +142,7 @@ node *add(node *root1 , node *root2){
 }
 
 
-//substraction O(log^2(d))
+//substraction O(dlog(d))
 node *substract(node *root1 , node *root2){
     if(!root1 && root2){return root2;}
     if(!root2 && root1){return root1;}
@@ -153,7 +153,7 @@ node *substract(node *root1 , node *root2){
 }
 
 
-//multiplication O(log^3(d))
+//multiplication O(d^2logd)
 node *multiply(node *root1 , node *root2){
     if(!root1 || !root2){return nullptr;}
     node *ans = nullptr;
