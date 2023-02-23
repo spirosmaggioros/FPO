@@ -153,20 +153,14 @@ node *substract(node *root1 , node *root2){
 }
 
 
-//multiplication O(dlog^2(d))
+//multiplication O(d^2logd)
 node *multiply(node *root1 , node *root2){
     if(!root1 || !root2){return nullptr;}
     node *ans = nullptr;
     stack<node*> s;
     s.push(root1);
-    while(!s.empty()){
-        auto current = s.top();
-        s.pop();
-        __inorder([&](node *callbacked){ans = insert(ans , callbacked -> coeff * current -> coeff , callbacked -> expon + current -> expon);} , root2);
-        if(current -> right){s.push(current -> right);}
-        if(current -> left){s.push(current -> left);}
-    }
-    return ans;
+    __inorder([&](node *callbacked){__inorder([&](node *callbacked2){ans = insert(ans , callbacked2 -> coeff * callbacked -> coeff , callbacked -> expon + callbacked2 -> expon);} , root2);} ,root1);
+     return ans;
 }
 
 ostream & operator << (ostream &out , node *root){
