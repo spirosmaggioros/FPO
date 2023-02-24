@@ -157,8 +157,6 @@ node *substract(node *root1 , node *root2){
 node *multiply(node *root1 , node *root2){
     if(!root1 || !root2){return nullptr;}
     node *ans = nullptr;
-    stack<node*> s;
-    s.push(root1);
     __inorder([&](node *callbacked){__inorder([&](node *callbacked2){ans = insert(ans , callbacked2 -> coeff * callbacked -> coeff , callbacked -> expon + callbacked2 -> expon);} , root2);} ,root1);
      return ans;
 }
